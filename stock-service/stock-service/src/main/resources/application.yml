@@ -3,7 +3,6 @@ spring:
     name: stock-service
 
 server:
-  address: localhost
   port: 8301
 
 eureka:
@@ -13,4 +12,4 @@ eureka:
     registerWithEureka: true
     fetchRegistry: true
     serviceUrl:
-      defaultZone: http://localhost:8070/eureka/
+      defaultZone: http://localhost:8302/eureka/

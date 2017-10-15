@@ -26,7 +26,7 @@ public class StockResource {
     @GetMapping("/{username}")
     public List<Stock> getStock(@PathVariable("username") final String username) {
         ResponseEntity<List<String>> quoteResponse = restTemplate.exchange(
-                "http://localhost:8300/rest/db" + username,
+                "http://localhost:8300/rest/db/" + username,
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<String>>() {}
