@@ -36,6 +36,16 @@ public class DbServiceResource {
         return getQuotesByUserName(quotes.getUserName());
     }
 
+    @PutMapping("/remove-quotes/{username}")
+    public List<String> removeQuotes(@PathVariable("username") final String username, @RequestBody final Quotes quotes) {
+        quotes.getQuotes()
+                .stream()
+                .map(quote -> new Quote(username, quote))
+                .forEach(quote -> quotesRepository.delete(quotesRepository.findByUserNameAndQuote(username, quote.getQuote())));
+
+        return getQuotesByUserName(username);
+    }
+
     @DeleteMapping("/delete/{username}")
     public List<String> delete(@PathVariable("username") final String username) {
         quotesRepository.delete(quotesRepository.findByUserName(username));

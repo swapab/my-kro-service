@@ -13,6 +13,7 @@ import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,9 +25,9 @@ public class StockResource {
     RestTemplate restTemplate;
 
     @GetMapping("/{username}")
-    public List<Stock> getStock(@PathVariable("username") final String username) {
+    public List<Quote> getStock(@PathVariable("username") final String username) {
         ResponseEntity<List<String>> quoteResponse = restTemplate.exchange(
-                "http://localhost:8300/rest/db/" + username,
+                "http://db-service/rest/db/" + username,
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<String>>() {}
@@ -34,7 +35,11 @@ public class StockResource {
 
         List<String> quotes = quoteResponse.getBody();
 
-        return quotes.stream().map(this::getStockPrice).collect(Collectors.toList());
+        return quotes.stream().map(quote -> {
+                    Stock stock = getStockPrice(quote);
+                    return new Quote(quote, stock.getQuote().getPrice());
+                }
+        ).collect(Collectors.toList());
     }
 
     private Stock getStockPrice(String quote) {
@@ -43,6 +48,32 @@ public class StockResource {
         } catch (IOException e) {
             e.printStackTrace();
             return new Stock(quote);
+        }
+    }
+
+    private class Quote {
+        private String quote;
+        private BigDecimal price;
+
+        public Quote(String quote, BigDecimal price) {
+            this.quote = quote;
+            this.price = price;
+        }
+
+        public String getQuote() {
+            return quote;
+        }
+
+        public void setQuote(String quote) {
+            this.quote = quote;
+        }
+
+        public BigDecimal getPrice() {
+            return price;
+        }
+
+        public void setPrice(BigDecimal price) {
+            this.price = price;
         }
     }
 }
